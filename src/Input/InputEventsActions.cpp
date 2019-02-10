@@ -553,6 +553,12 @@ InputEvents::eventCredits(gcc_unused const TCHAR *misc)
   dlgCreditsShowModal(*CommonInterface::main_window);
 }
 
+void
+InputEvents::eventFlightLog(gcc_unused const TCHAR *misc)
+{
+  dlgFlightLogShowModal(*CommonInterface::main_window);
+}
+
 // Run
 // Runs an external program of the specified filename.
 // Note that XCSoar will wait until this program exits.

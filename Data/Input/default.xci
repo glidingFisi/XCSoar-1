@@ -867,6 +867,13 @@ event=RepeatStatusMessage
 label=Message\nRepeat
 location=7
 
+mode=Info3
+type=key
+data=9
+event=FlightLog
+event=Mode default
+label=Flight Log
+location=8
 # -------------
 # mode=Menu
 # -------------

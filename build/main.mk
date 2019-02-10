@@ -142,6 +142,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Weather/RASPDialog.cpp \
 	$(SRC)/Dialogs/dlgCredits.cpp \
 	$(SRC)/Dialogs/dlgQuickMenu.cpp \
+	$(SRC)/Dialogs/dlgFlightLog.cpp \
 
 ifeq ($(HAVE_PCM_PLAYER),y)
 DIALOG_SOURCES += \
@@ -205,6 +206,9 @@ XCSOAR_SOURCES := \
 	$(SRC)/Renderer/ThermalBandRenderer.cpp \
 	$(SRC)/Renderer/TaskProgressRenderer.cpp \
 	$(SRC)/Renderer/ClimbPercentRenderer.cpp \
+	$(SRC)/Logger/FlightParser.cpp \
+	$(SRC)/Renderer/FlightListRenderer.cpp \
+	$(SRC)/FlightInfo.cpp \
 	\
 	$(SRC)/Airspace/AirspaceGlue.cpp \
 	$(SRC)/Airspace/AirspaceParser.cpp \

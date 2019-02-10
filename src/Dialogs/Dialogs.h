@@ -38,6 +38,8 @@ void dlgStatusShowModal(int page);
 
 void dlgCreditsShowModal(SingleWindow &parent);
 
+void dlgFlightLogShowModal(SingleWindow &parent);
+
 void dlgQuickMenuShowModal(SingleWindow &parent);
 
 #endif
