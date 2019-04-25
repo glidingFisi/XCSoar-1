@@ -36,6 +36,9 @@ Copyright_License {
 
 #include <algorithm>
 
+/** timeout of infobox focus */
+static constexpr std::chrono::steady_clock::duration FOCUS_TIMEOUT_MAX = std::chrono::seconds(20);
+
 InfoBoxWindow::InfoBoxWindow(ContainerWindow &parent, PixelRect rc,
                              unsigned border_flags,
                              const InfoBoxSettings &_settings,
@@ -402,7 +405,7 @@ InfoBoxWindow::OnMouseDown(PixelPoint p)
     Invalidate();
 
     /* start "long click" detection */
-    dialog_timer.Schedule(1000);
+    dialog_timer.Schedule(std::chrono::seconds(1));
   }
 
   return true;
@@ -427,7 +430,7 @@ InfoBoxWindow::OnMouseUp(PixelPoint p)
 
       if (GetDialogContent() != nullptr)
         /* delay the dialog, so double click detection works */
-        dialog_timer.Schedule(300);
+        dialog_timer.Schedule(std::chrono::milliseconds(300));
     }
 
     return true;
@@ -488,7 +491,7 @@ InfoBoxWindow::OnSetFocus()
 
   // Start the focus-auto-return timer
   // to automatically return focus back to MapWindow if idle
-  focus_timer.Schedule(HasCursorKeys() ? FOCUS_TIMEOUT_MAX : 1100);
+  focus_timer.Schedule(HasCursorKeys() ? FOCUS_TIMEOUT_MAX : std::chrono::milliseconds(1100));
 
   // Redraw fast to paint the selector
   Invalidate();

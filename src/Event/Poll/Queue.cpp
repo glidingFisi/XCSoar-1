@@ -23,7 +23,6 @@ Copyright_License {
 
 #include "Queue.hpp"
 #include "DisplayOrientation.hpp"
-#include "OS/Clock.hpp"
 
 EventQueue::EventQueue()
   :SignalListener(io_service),
@@ -85,12 +84,8 @@ EventQueue::Pop(Event &event)
     return false;
 
   ScopeLock protect(mutex);
-  if (events.empty())
-    return false;
-
   if (events.empty()) {
-    if (Generate(event))
-      return true;
+    return Generate(event);
   }
 
   event = events.front();

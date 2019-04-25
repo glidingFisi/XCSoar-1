@@ -39,6 +39,9 @@ Copyright_License {
 #include "Thread/Debug.hpp"
 #include "Util/tstring.hpp"
 #include "Util/StaticFifoBuffer.hxx"
+#include "Android/GliderLink.hpp"
+
+#include <chrono>
 
 #include <assert.h>
 #include <tchar.h>
@@ -162,6 +165,7 @@ class DeviceDescriptor final : Notify, PortListener, PortLineSplitter {
   I2CbaroDevice *i2cbaro[3]; // static, pitot, tek; in any order
   NunchuckDevice *nunchuck;
   VoltageDevice *voltage;
+  GliderLink *glider_link;
 #endif
 
   /**
@@ -280,7 +284,7 @@ public:
   /**
    * @see DumpPort::EnableTemporarily()
    */
-  void EnableDumpTemporarily(unsigned duration_ms);
+  void EnableDumpTemporarily(std::chrono::steady_clock::duration duration) noexcept;
 
   /**
    * Wrapper for Driver::HasTimeout().  This method can't be inline
@@ -336,11 +340,13 @@ private:
   bool OpenNunchuck();
 
   bool OpenVoltage();
+
+  bool OpenGliderLink();
 public:
   /**
    * To be used by OpenDeviceJob, don't call directly.
    */
-  bool DoOpen(OperationEnvironment &env);
+  bool DoOpen(OperationEnvironment &env) noexcept;
 
   void ResetFailureCounter() {
     n_failures = 0u;

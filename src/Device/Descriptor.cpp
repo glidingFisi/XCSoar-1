@@ -36,6 +36,7 @@ Copyright_License {
 #include "Thread/Mutex.hpp"
 #include "Util/StringAPI.hxx"
 #include "Util/ConvertString.hpp"
+#include "Util/Exception.hxx"
 #include "Logger/NMEALogger.hpp"
 #include "Language/Language.hpp"
 #include "Operation/Operation.hpp"
@@ -49,6 +50,7 @@ Copyright_License {
 #include "Java/Object.hxx"
 #include "Java/Global.hxx"
 #include "Android/InternalSensors.hpp"
+#include "Android/GliderLink.hpp"
 #include "Android/Main.hpp"
 #include "Android/Product.hpp"
 #include "Android/IOIOHelper.hpp"
@@ -61,8 +63,6 @@ Copyright_License {
 #ifdef __APPLE__
 #include "Apple/InternalSensors.hpp"
 #endif
-
-#include <stdexcept>
 
 #include <assert.h>
 
@@ -113,6 +113,7 @@ DeviceDescriptor::DeviceDescriptor(boost::asio::io_service &_io_service,
    droidsoar_v2(nullptr),
    nunchuck(nullptr),
    voltage(nullptr),
+   glider_link(nullptr),
 #endif
    n_failures(0u),
    ticker(false), borrowed(false)
@@ -178,6 +179,9 @@ DeviceDescriptor::GetState() const
 
   if (voltage != nullptr)
     return PortState::READY;
+
+  if (glider_link != nullptr)
+    return PortState::READY;
 #endif
 
   return PortState::FAILED;
@@ -197,10 +201,10 @@ DeviceDescriptor::DisableDump()
 }
 
 void
-DeviceDescriptor::EnableDumpTemporarily(unsigned duration_ms)
+DeviceDescriptor::EnableDumpTemporarily(std::chrono::steady_clock::duration duration) noexcept
 {
   if (port != nullptr)
-    port->EnableTemporarily(duration_ms);
+    port->EnableTemporarily(duration);
 }
 
 bool
@@ -223,8 +227,8 @@ DeviceDescriptor::CancelAsync()
 
   try {
     async.Wait();
-  } catch (const std::runtime_error &e) {
-    LogError(e);
+  } catch (...) {
+    LogError(std::current_exception());
   }
 
   delete open_job;
@@ -412,8 +416,24 @@ DeviceDescriptor::OpenVoltage()
 }
 
 bool
-DeviceDescriptor::DoOpen(OperationEnvironment &env)
+DeviceDescriptor::OpenGliderLink()
 {
+#ifdef ANDROID
+  if (is_simulator())
+    return true;
+
+  glider_link = GliderLink::create(Java::GetEnv(), context, GetIndex());
+
+  return true;
+#else
+  return false;
+#endif
+}
+
+
+bool
+DeviceDescriptor::DoOpen(OperationEnvironment &env) noexcept
+try {
   assert(config.IsAvailable());
 
   {
@@ -436,20 +456,25 @@ DeviceDescriptor::DoOpen(OperationEnvironment &env)
   if (config.port_type == DeviceConfig::PortType::IOIOVOLTAGE)
     return OpenVoltage();
 
+  if (config.port_type == DeviceConfig::PortType::GLIDER_LINK)
+    return OpenGliderLink();
+
   reopen_clock.Update();
 
   Port *port;
   try {
     port = OpenPort(io_service, config, this, *this);
-  } catch (const std::runtime_error &e) {
+  } catch (...) {
+    const auto e = std::current_exception();
+
     TCHAR name_buffer[64];
     const TCHAR *name = config.GetPortName(name_buffer, 64);
 
-    LogError(WideToUTF8Converter(name), e);
+    LogError(e, WideToUTF8Converter(name));
 
     StaticString<256> msg;
 
-    const UTF8ToWideConverter what(e.what());
+    const UTF8ToWideConverter what(GetFullMessage(e).c_str());
     if (what.IsValid()) {
       ScopeLock protect(mutex);
       error_message = what;
@@ -485,6 +510,10 @@ DeviceDescriptor::DoOpen(OperationEnvironment &env)
 
   ResetFailureCounter();
   return true;
+} catch (...) {
+  const UTF8ToWideConverter msg(GetFullMessage(std::current_exception()).c_str());
+  env.SetErrorMessage(msg);
+  return false;
 }
 
 void
@@ -539,6 +568,8 @@ DeviceDescriptor::Close()
   delete voltage;
   voltage = nullptr;
 
+  delete glider_link;
+  glider_link = nullptr;
 #endif
 
   /* safely delete the Device object */
@@ -1137,8 +1168,8 @@ DeviceDescriptor::OnNotification()
 
   try {
     async.Wait();
-  } catch (const std::runtime_error &e) {
-    LogError(e);
+  } catch (...) {
+    LogError(std::current_exception());
   }
 
   delete open_job;

@@ -27,7 +27,6 @@ Copyright_License {
 #include "Protocol.hpp"
 #include "Import.hpp"
 #include "OS/ByteOrder.hpp"
-#include "Net/StaticSocketAddress.hxx"
 #include "Math/Angle.hpp"
 #include "Geo/GeoPoint.hpp"
 #include "Util/CRC.hpp"
@@ -289,7 +288,7 @@ SkyLinesTracking::Client::OnReceive(const boost::system::error_code &ec,
     }
 
     if (handler != nullptr)
-      handler->OnSkyLinesError(boost::system::system_error(ec));
+      handler->OnSkyLinesError(std::make_exception_ptr(boost::system::system_error(ec)));
     return;
   }
 
@@ -324,7 +323,7 @@ SkyLinesTracking::Client::OnResolved(const boost::system::error_code &ec,
 
   if (ec) {
     if (handler != nullptr)
-      handler->OnSkyLinesError(boost::system::system_error(ec));
+      handler->OnSkyLinesError(std::make_exception_ptr(boost::system::system_error(ec)));
     return;
   }
 
