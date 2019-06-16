@@ -41,6 +41,7 @@ Copyright_License {
 #include "InfoBoxes/Content/Trace.hpp"
 #include "InfoBoxes/Content/Weather.hpp"
 #include "InfoBoxes/Content/Airspace.hpp"
+#include "InfoBoxes/Content/MarkerStart.hpp"
 
 #include "Util/Macros.hpp"
 #include "Language/Language.hpp"
@@ -1067,6 +1068,14 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxNbrSat,
   },
 
+
+  // e_MarkerStart
+  {
+    N_("Marker Start"),
+    N_("Marker Start"),
+    N_("Start timer for marker start."),
+    IBFHelper<InfoBoxContentMarkerStart>::Create,
+  },
 };
 
 static_assert(ARRAY_SIZE(meta_data) == NUM_TYPES,

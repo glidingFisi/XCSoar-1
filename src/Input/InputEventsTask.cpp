@@ -103,6 +103,27 @@ InputEvents::eventArmAdvance(const TCHAR *misc)
   CommonInterface::ReadCommonStats(task_manager->GetCommonStats());
 }
 
+
+void
+InputEvents::eventMarkerStart(const TCHAR *misc)
+{
+  if (protected_task_manager == NULL)
+    return;
+
+  ProtectedTaskManager::ExclusiveLease task_manager(*protected_task_manager);
+  TaskAdvance &advance = task_manager->SetTaskAdvance();
+
+  if (0 < advance.GetMarkerStart()) {
+    // Timer is active.
+  	return;
+  }
+  
+  const MoreData &basic = CommonInterface::Basic();
+  BrokenDateTime time = basic.date_time_utc;
+  advance.SetMarkerStart((time.hour * 60 *60) + ( time.minute * 60) +  time.second);
+}
+
+
 void
 InputEvents::eventCalculator(gcc_unused const TCHAR *misc)
 {

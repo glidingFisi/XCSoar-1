@@ -130,6 +130,7 @@ namespace InputEvents
   void eventMacCready(const TCHAR *misc);
   void eventMainMenu(const TCHAR *misc);
   void eventMarkLocation(const TCHAR *misc);
+  void eventMarkerStart(const TCHAR *misc);
   void eventMode(const TCHAR *misc);
   void eventNearestAirspaceDetails(const TCHAR *misc);
   void eventNearestWaypointDetails(const TCHAR *misc);

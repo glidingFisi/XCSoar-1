@@ -40,6 +40,8 @@ protected:
   /** need to arm */
   bool request_armed = false;
 
+  double markerstart_time = 0;
+
 public:
 
   /**
@@ -119,6 +121,13 @@ public:
   virtual bool CheckReadyToAdvance(const TaskPoint &tp,
                                    const AircraftState &state,
                                    const bool x_enter, const bool x_exit) = 0;
+
+  /**
+   * Set Makrer Start trigger
+   *
+   */
+  void SetMarkerStart(double time);
+  double GetMarkerStart(void);
 
 protected:
   /** 

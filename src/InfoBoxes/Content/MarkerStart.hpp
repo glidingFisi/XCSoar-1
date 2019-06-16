@@ -1,4 +1,5 @@
-/* Copyright_License {
+/*
+Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
   Copyright (C) 2000-2016 The XCSoar Project
@@ -18,33 +19,23 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
- */
+*/
 
-#ifndef XCSOAR_ORDERED_TASK_SETTINGS_HPP
-#define XCSOAR_ORDERED_TASK_SETTINGS_HPP
+#ifndef XCSOAR_INFOBOX_CONTENT_MARKER_START_HPP
+#define XCSOAR_INFOBOX_CONTENT_MARKER_START_HPP
 
-#include "StartConstraints.hpp"
-#include "FinishConstraints.hpp"
-#include "Task/Shapes/FAITriangleSettings.hpp"
+#include "InfoBoxes/Content/Base.hpp"
 
-/**
- * Settings for ordered tasks; most of these are set by
- * the #AbstractTaskFactory but can be overriden
- */
-struct OrderedTaskSettings {
-  /** Desired AAT minimum task time (s) */
-  double aat_min_time;
+struct InfoBoxData;
 
-  /* Marker Start */
-  double marker_start_wait_time;
-  double marker_start_line_open_time;
-
-  StartConstraints start_constraints;
-  FinishConstraints finish_constraints;
-
-  FAITriangleSettings fai_triangle;
-
-  void SetDefaults();
+class InfoBoxContentMarkerStart : public InfoBoxContent
+{
+public:
+  virtual void Update(InfoBoxData &data) override;
+  virtual bool HandleKey(const InfoBoxKeyCodes keycode) override;
 };
+
+void
+UpdateInfoBoxMarkerStart(InfoBoxData &data);
 
 #endif

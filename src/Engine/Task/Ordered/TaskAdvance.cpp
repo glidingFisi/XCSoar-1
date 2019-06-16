@@ -89,3 +89,15 @@ TaskAdvance::ToggleArmed()
   UpdateState();
   return armed;
 }
+
+void
+TaskAdvance::SetMarkerStart(double _time)
+{
+  markerstart_time = _time;
+}
+
+double
+TaskAdvance::GetMarkerStart(void)
+{
+  return markerstart_time;
+}

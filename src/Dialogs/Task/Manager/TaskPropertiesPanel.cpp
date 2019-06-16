@@ -44,6 +44,8 @@ enum Controls {
   FINISH_MIN_HEIGHT,
   FINISH_HEIGHT_REF,
   FAI_FINISH_HEIGHT,
+  MARKER_START_WAIT_TIME,
+  MARKER_START_LINE_OPEN_TIME
 };
 
 TaskPropertiesPanel::TaskPropertiesPanel(TaskManagerDialog &_dialog,
@@ -93,6 +95,9 @@ TaskPropertiesPanel::RefreshView()
   LoadValue(FAI_FINISH_HEIGHT, fai_start_finish);
 
   LoadValueEnum(TASK_TYPE, ftype);
+
+  LoadValueTime(MARKER_START_WAIT_TIME, (int)p.marker_start_wait_time);
+  LoadValueTime(MARKER_START_LINE_OPEN_TIME, (int)p.marker_start_line_open_time);
 
   dialog.InvalidateTaskView();
 
@@ -153,6 +158,18 @@ TaskPropertiesPanel::ReadValues()
   changed |= SaveValueEnum(FINISH_HEIGHT_REF,
                            p.finish_constraints.min_height_ref);
 
+
+  int marker_start_wait_time = GetValueInteger(MARKER_START_WAIT_TIME);
+  if (marker_start_wait_time != (int)p.marker_start_wait_time) {
+    p.marker_start_wait_time = marker_start_wait_time;
+    changed = true;
+  }
+
+  int marker_start_line_open_time = GetValueInteger(MARKER_START_LINE_OPEN_TIME);
+  if (marker_start_line_open_time != (int)p.marker_start_line_open_time) {
+    p.marker_start_line_open_time = marker_start_line_open_time;
+    changed = true;
+  }
   if (changed)
     ordered_task->SetOrderedTaskSettings(p);
 
@@ -260,6 +277,14 @@ TaskPropertiesPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddBoolean(_("FAI start / finish rules"),
              _("If enabled, has no max start height or max start speed and requires the minimum height above ground for finish to be greater than 1000m below the start height."),
              false, this);
+
+  AddTime(_("Marker start wait time"),
+          _("Marker start wait time, before line is open in minutes."),
+          60, 60*60, 60, 9*60);
+
+  AddTime(_("Marker start line open time"),
+          _("Line open time after marker start wait time have ended in minutes."),
+          60, 60*60, 60, 2*60);
 }
 
 void
